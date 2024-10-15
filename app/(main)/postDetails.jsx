@@ -1,7 +1,7 @@
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import {useLocalSearchParams, useRouter} from 'expo-router'
-import { createComment, fetchPostDetails, removeComment } from '../../services/postService';
+import { createComment, fetchPostDetails, removeComment, removePost } from '../../services/postService';
 import { hp, wp } from '../../helper/common';
 import { theme } from '../../constants/theme';
 import PostCard from '../../components/PostCard';
@@ -13,11 +13,12 @@ import Icon from '../../assets/icons';
 import CommentItem from '../../components/CommentItem';
 import { supabase } from '../../lib/supabase';
 import { getUserData } from '../../services/userService';
+import { createNotification } from '../../services/notificationService';
 
 
 
 const PostDetails = () => {
-    const {postId} = useLocalSearchParams();
+    const {postId, commentId} = useLocalSearchParams();
     const {user} = useAuth();
     const router = useRouter();
     const [startLoading, setStartLoading] = useState(true);
@@ -26,12 +27,12 @@ const PostDetails = () => {
     const [loading, setLoading] = useState(false);
     //console.log(postId);
 
-    const [post, setPost] = useState(null);
+    const [post, setPost] = useState(null); // luu tru bai dang
 
     //console.log('post detail item: ', post)
 
     const handleNewComment = async (payload) => {
-        //console.log('get new comment: ', payload.new);
+        console.log('get new comment: ', payload.new);
         if(payload.new){
             let newComment = {...payload.new};
             let res = await getUserData(newComment.userId);
@@ -84,6 +85,19 @@ const PostDetails = () => {
         let res = await createComment(data);
         setLoading(false);
         if(res.success){
+            if(user.id != post.userId){
+                let notify = {
+                    senderId: user.id,
+                    receiverId: post.userId,
+                    title: 'Đã bình luận bài đăng của bạn',
+                    data: JSON.stringify({
+                        postId: post.id,
+                        commentId: res?.data?.id
+                    })
+                }
+
+                createNotification(notify);
+            }
             inputRef?.current?.clear();
             commentRef.current = "";
         }else{
@@ -106,6 +120,28 @@ const PostDetails = () => {
         }
     }
 
+    // delete post
+    const onDeletePost = async (item) => {
+        let res = await removePost(post.id);
+        if(res.success){
+            router.back();
+            console.log(res.data);
+        }else{
+            Alert.alert('Post', res.msg);
+        }
+    }
+
+    // edit post
+    const onEditPost = async (item) => {
+        router.back();
+        router.push({
+            pathname: 'newPost',
+            params: {
+                ...item
+            }
+        })
+    }
+
     if(startLoading){
         return (
             <View style={styles.center}>
@@ -123,6 +159,9 @@ const PostDetails = () => {
                         router={router}
                         hashShadow={false}
                         showMoreIcon={false}
+                        showDelete={true}
+                        onDelete={onDeletePost}
+                        onEdit={onEditPost}
                     />
 
                     {/* comment input */}
@@ -156,6 +195,7 @@ const PostDetails = () => {
                                     key={comment?.id?.toString()}
                                     item={comment}
                                     onDelete={onDeleteComment}
+                                    highlight ={comment.id == commentId}
                                     canDelete={user.id == comment.userId || user.id == post.userId}
                                 />
                             )

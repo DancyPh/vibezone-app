@@ -33,25 +33,46 @@ export const createOrUpdatePost = async (post) => {
 }
 
 
-export const fetchPosts = async (limit=10) => {
+export const fetchPosts = async (limit=10, userId) => {
     try{
-        const {data, error} = await supabase
-        .from('posts')
-        .select(`
-                *,
-                user: users (id, name, image),
-                postLikes (*),
-                comments (count)
-            `)
-        .order('created_at', {ascending: false})
-        .limit(limit);
+        if(userId){
+            const {data, error} = await supabase
+            .from('posts')
+            .select(`
+                    *,
+                    user: users (id, name, image),
+                    postLikes (*),
+                    comments (count)
+                `)
+            .order('created_at', {ascending: false})
+            .eq('userId', userId)
+            .limit(limit);
 
-        if(error){
-            console.log('fetch post error: ', error);
-            return{ success: false, msg: 'Khoong the tai bai dang'}
+            if(error){
+                console.log('fetch post error: ', error);
+                return{ success: false, msg: 'Khoong the tai bai dang'}
+            }
+
+            return {success: true, data: data};
+        }else{
+            const {data, error} = await supabase
+            .from('posts')
+            .select(`
+                    *,
+                    user: users (id, name, image),
+                    postLikes (*),
+                    comments (count)
+                `)
+            .order('created_at', {ascending: false})
+            .limit(limit);
+
+            if(error){
+                console.log('fetch post error: ', error);
+                return{ success: false, msg: 'Khoong the tai bai dang'}
+            }
+
+            return {success: true, data: data};
         }
-
-        return {success: true, data: data};
     }catch(e){
         console.log('fetch post error: ', e);
         return{ success: false, msg: 'Khoong the tai bai dang'}
@@ -164,5 +185,25 @@ export const removeComment = async (commentId) => {
     }catch(e){
         console.log('delete comment  error: ', e);
         return{ success: false, msg: 'Khoong the go bo thich bai dang'}
+    }
+}
+
+export const removePost = async (postId) => {
+    try{
+       
+        const {error} = await supabase
+        .from('posts')
+        .delete()
+        .eq('id', postId)
+        
+        if(error){
+            console.log('delete post  error: ', error);
+            return{ success: false, msg: 'Khoong the go bo bai dang'}
+        }
+
+        return {success: true, data: {postId}};
+    }catch(e){
+        console.log('delete post  error: ', e);
+        return{ success: false, msg: 'Khoong the go bo bai dang'}
     }
 }

@@ -9,10 +9,11 @@ import Icon from '../assets/icons'
 const CommentItem = ({
     item,
     canDelete= false,
-    onDelete = ()=>{}
+    onDelete = ()=>{},
+    highlight = false
 }) => {
 
-    const createdAt = moment(item?.created_at).format('MMM d');
+    const createdAt= moment(item?.created_at).format('MMM d');
 
     const handleDelete = () => {
         Alert.alert('Confirm', "Are you sure you want to delete", [
@@ -26,7 +27,7 @@ const CommentItem = ({
               onPress: () => onDelete(item),
               style: 'destructive'
             }
-          ])
+        ])
     }
 
   return (
@@ -34,7 +35,7 @@ const CommentItem = ({
         <Avatar
             uri={item?.user?.image}
         />
-        <View style={styles.content}>
+        <View style={[styles.content, highlight && styles.highlight]}>
             <View style={{flexDirection:'row', justifyContent: 'space-between', alignItems: 'center'}}>
                 <View style={styles.nameContainer}>
                     <Text style={styles.text}>
@@ -83,14 +84,12 @@ const styles = StyleSheet.create({
         borderCurve: 'continuous'
     },
     highlight: {
-        borderWidth: 0.2,
         backgroundColor: 'white',
-        borderColor: theme.colors.dark,
         shadowColor: theme.colors.dark,
         shadowOffset: {width: 0, height: 0},
-        shadowOpacity: 0.3,
+        shadowOpacity: 0.8,
         shadowRadius: 8,
-        elevation: 5
+        elevation: 10,
     },
     nameContainer: {
         flexDirection: 'row',
