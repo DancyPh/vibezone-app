@@ -4,6 +4,7 @@ import { fetchUsers } from '../../services/userService';
 import ChatItem from '../../components/ChatItem';
 import ScreenWrapper from '../../components/ScreenWrapper';
 import { useRouter } from 'expo-router';
+import Header from '../../components/Header'
 
 const Chat = () => {
 
@@ -29,7 +30,7 @@ const Chat = () => {
     router.push({
       pathname: "/(main)/chatDetail",
       params: {
-        userId: user.id,
+        userId: user.id,  
         name: user.name,
         image: user.image
       }
@@ -39,7 +40,9 @@ const Chat = () => {
   return (
     <ScreenWrapper>
         <View style={{ flex: 1, padding: 10 }}>
+          <Header title="Chats"/>
           <FlatList
+            style={{marginTop: 20}}
             data={users}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (

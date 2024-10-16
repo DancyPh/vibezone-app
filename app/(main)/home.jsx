@@ -69,6 +69,21 @@ const Home = () => {
      }
   }
 
+  // const handleNewComment = async (payload) => {
+  //   console.log('get new comment: ', payload.new);
+  //   if(payload.eventType=='INSERT' && payload.new.id){
+  //       let newComment = {...payload.new};
+  //       let res = await getUserData(newComment.userId);
+  //       newComment.user = res.success? res.data: {};
+  //       setPosts(prevPost => {
+  //           return {
+  //               ...prevPost,
+  //               comments: [newComment, ...prevPost.comments]
+  //           }
+  //       })
+  //   }
+  //}
+
   useEffect(()=> {
     let postChannel = supabase
     .channel('posts')
@@ -96,9 +111,18 @@ const Home = () => {
     )
     .subscribe();
 
+    // let commentChannel = supabase
+    //     .channel('comments')
+    //     .on('postgres_changes', 
+    //       {event: 'INSERT', schema: 'public', table: 'comments'},
+    //       (payload) => handleNewComment(payload)
+    //     )
+    //     .subscribe();
+
     return () => {
       supabase.removeChannel(postChannel);
       supabase.removeChannel(notificationChannel);
+      // supabase.removeChannel(commentChannel);
     }
   }, [])
 
