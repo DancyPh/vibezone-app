@@ -1,13 +1,61 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { fetchUsers } from '../../services/userService';
+import ChatItem from '../../components/ChatItem';
+import ScreenWrapper from '../../components/ScreenWrapper';
+import { useRouter } from 'expo-router';
 
 const Chat = () => {
+
+  const [users, setUsers] = useState([]);
+
+  const router = useRouter();
+  useEffect(() => {
+      const getUsers = async () => {
+        const res = await fetchUsers();
+        if(res.success){
+          setUsers(res.data);
+        }else {
+          console.log(res.msg);
+        }
+      }
+
+      getUsers();
+  }, [])
+
+  //console.log(users)
+  
+  const handleChatPress = async(user) => {
+    router.push({
+      pathname: "/(main)/chatDetail",
+      params: {
+        userId: user.id,
+        name: user.name,
+        image: user.image
+      }
+    })
+  }
+
   return (
-    <View>
-      <Text>Chat</Text>
-    </View>
-  )
+    <ScreenWrapper>
+        <View style={{ flex: 1, padding: 10 }}>
+          <FlatList
+            data={users}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity onPress={() => handleChatPress(item)}>
+                  <ChatItem
+                    item={item}
+                  />
+              </TouchableOpacity>
+            )}
+          />
+      </View>
+    </ScreenWrapper>
+    
+  );
 }
+
 
 export default Chat
 
