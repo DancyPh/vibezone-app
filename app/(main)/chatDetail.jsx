@@ -1,4 +1,4 @@
-import { Button, FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
@@ -7,6 +7,10 @@ import { getUserData } from '../../services/userService';
 import { loadMessages } from '../../services/chatService';
 import ScreenWrapper from '../../components/ScreenWrapper';
 import Header from '../../components/Header'
+import Icon from '../../assets/icons';
+import { theme } from '../../constants/theme';
+import { hp } from '../../helper/common';
+import HeaderDetailChat from '../../components/HeaderDetailChat';
 
 const ChatDetail = () => {
   const params = useLocalSearchParams();
@@ -86,7 +90,21 @@ const ChatDetail = () => {
   return (
     <ScreenWrapper>
         <View style={styles.container}>
-            <Header title={params.name}/>
+          <HeaderDetailChat title={params.name} uri={params.image} mb={20}/>
+          <View style={styles.listIcons}>
+            {/* Call */}
+            <TouchableOpacity style={styles.icon}>
+              <Icon name="call" size={hp(2.4)} />
+            </TouchableOpacity>
+            {/* Video call */}
+            <TouchableOpacity style={styles.icon}>
+              <Icon name="video" size={hp(2.7)} />
+            </TouchableOpacity>
+            {/* Edit Chat Box */}
+            <TouchableOpacity style={styles.icon}>
+              <Icon name="threeDotsVertical" size={hp(2.7)} strokeWidth = {4} />
+            </TouchableOpacity>
+          </View>
             <FlatList
                 data={messages}
                 keyExtractor={(item) => item.id.toString()}
@@ -102,7 +120,7 @@ const ChatDetail = () => {
                 onChangeText={setNewMessage}
                 placeholder="Type a message"
                 style={styles.input}
-                />
+                /> 
                 <Button title="Send" onPress={handleSendMessage} />
             </View>
         </View>
@@ -147,4 +165,15 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 10,
   },
+  listIcons: {
+    position: 'absolute',
+    right: 0,
+    marginTop: 10,
+    flexDirection: 'row'
+  },
+  icon: {
+    marginTop: 10,
+    paddingHorizontal: 10,
+    borderRadius: theme.radius.sm
+  }
 });

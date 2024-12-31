@@ -1,34 +1,40 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { useRouter } from 'expo-router'
-import BackButton from './BackButton'
-import {wp, hp} from '../helper/common'
+import { hp } from '../helper/common'
 import { theme } from '../constants/theme'
+import BackButton from './BackButton'
+import { useRouter } from 'expo-router'
+import Avatar from './Avatar'
 
-const Header = ({title, showBackButton = true, mb = 10}) => {
-    const router = useRouter();
+const HeaderDetailChat = ({
+    title,
+    uri,
+    showBackButton = true,
+    mb = 10
+}) => {
+    const router = useRouter()
   return (
     <View style={[styles.container, {marginBottom: mb}]}>
       {
         showBackButton && (
             <View style={styles.showBackButton}>
-                <BackButton bgColor={true} name="arrowLeft" router={router}/>
+                <BackButton name="arrowLeft" router={router}/>
             </View>
         )
       }
-
+      
+      <Avatar uri={uri}/>
       <Text style={styles.title}> {title || ""}</Text>
     </View>
   )
 }
 
-export default Header
+export default HeaderDetailChat
 
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: 'flex-start',
         marginTop: 7,
         gap: 10
     }, 
@@ -38,7 +44,6 @@ const styles = StyleSheet.create({
         color: theme.colors.dark
     },
     showBackButton: {
-        position: 'absolute',
-        left: 0
+        flex: 0
     }
 })
